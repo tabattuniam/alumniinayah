@@ -1,0 +1,299 @@
+{% extends "base_admin.html" %}
+{% block title %}{% if mode=='tambah' %}Tambah{% else %}Edit{% endif %} Alumni — Admin Al-Inayah{% endblock %}
+{% block page_title %}{% if mode=='tambah' %}Tambah Alumni{% else %}Edit Alumni{% endif %}{% endblock %}
+{% block nav_alumni %}active{% endblock %}
+
+{% block content %}
+{% if err %}<div class="alert-err">❌ {{ err }}</div>{% endif %}
+
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+  <a href="/admin/alumni" class="btn btn-ghost btn-sm">← Kembali</a>
+  <div style="font-size:16px;font-weight:800;">{% if mode=='tambah' %}➕ Tambah Alumni Baru{% else %}✏️ Edit Data Alumni{% endif %}</div>
+</div>
+
+<form method="post" enctype="multipart/form-data">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+<!-- Kolom Kiri -->
+<div>
+
+  <div class="card" style="padding:20px;">
+    <div class="form-section">📸 Foto & Identitas</div>
+    <div class="form-group" style="text-align:center;margin-bottom:16px;">
+      {% if data.foto %}
+        <img src="/static/foto_alumni/{{ data.foto }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:8px;display:block;margin:0 auto 8px;">
+      {% endif %}
+      <label class="form-label">Foto (jpg/png)</label>
+      <input type="file" name="foto" accept="image/*" class="form-input">
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap *</label>
+        <input name="nama_lengkap" class="form-input" value="{{ data.nama_lengkap or '' }}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nama Panggilan</label>
+        <input name="nama_panggilan" class="form-input" value="{{ data.nama_panggilan or '' }}">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Jenis Kelamin</label>
+        <select name="jenis_kelamin" class="form-select">
+          <option value="">— Pilih —</option>
+          <option value="L" {% if data.jenis_kelamin=='L' %}selected{% endif %}>Ikhwan (L)</option>
+          <option value="P" {% if data.jenis_kelamin=='P' %}selected{% endif %}>Akhwat (P)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tempat Lahir</label>
+        <input name="tempat_lahir" class="form-input" value="{{ data.tempat_lahir or '' }}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tanggal Lahir</label>
+      <input type="date" name="tanggal_lahir" class="form-input" value="{{ data.tanggal_lahir or '' }}">
+    </div>
+  </div>
+
+  <div class="card" style="padding:20px;margin-top:16px;">
+    <div class="form-section">📍 Domisili Sekarang</div>
+    <div class="form-group">
+      <label class="form-label">Alamat</label>
+      <textarea name="alamat" class="form-textarea">{{ data.alamat or '' }}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Desa / Kelurahan</label>
+      <input name="desa" class="form-input" value="{{ data.desa or '' }}" placeholder="Nama desa/kelurahan">
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Provinsi</label>
+        <select name="provinsi" id="sel-provinsi" class="form-select" onchange="loadKota('sel-provinsi','sel-kota')">
+          <option value="">— Pilih Provinsi —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kab / Kota</label>
+        <select name="kota" id="sel-kota" class="form-select" onchange="loadKecamatan('sel-kota','sel-kecamatan')">
+          <option value="">— Pilih Kota —</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Kecamatan</label>
+      <input name="kecamatan" id="sel-kecamatan" class="form-input" value="{{ data.kecamatan or '' }}" placeholder="Ketik kecamatan..." list="kec-list">
+      <datalist id="kec-list"></datalist>
+    </div>
+  </div>
+
+  <div class="card" style="padding:20px;margin-top:16px;">
+    <div class="form-section">📱 Kontak & Sosial Media</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">No. HP / WA</label>
+        <input name="no_hp" class="form-input" placeholder="08xxxxxxxxxx" value="{{ data.no_hp or '' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" class="form-input" value="{{ data.email or '' }}">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Instagram</label>
+        <input name="instagram" class="form-input" placeholder="@username" value="{{ data.instagram or '' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Facebook</label>
+        <input name="facebook" class="form-input" value="{{ data.facebook or '' }}">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Kolom Kanan -->
+<div>
+
+  <div class="card" style="padding:20px;">
+    <div class="form-section">🕌 Data Pesantren</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">No. Induk Santri</label>
+        <input name="no_induk" class="form-input" value="{{ data.no_induk or '' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Angkatan ke-</label>
+        <input type="number" name="angkatan" class="form-input" value="{{ data.angkatan or '' }}">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Tahun Masuk</label>
+        <input type="number" name="tahun_masuk" class="form-input" placeholder="2015" value="{{ data.tahun_masuk or '' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tahun Keluar</label>
+        <input type="number" name="tahun_keluar" class="form-input" placeholder="2020" value="{{ data.tahun_keluar or '' }}">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Program</label>
+        <select name="program" class="form-select">
+          <option value="">— Pilih —</option>
+          <option value="SMP" {% if data.program=='SMP' %}selected{% endif %}>SMP</option>
+          <option value="MTS" {% if data.program=='MTS' %}selected{% endif %}>MTS</option>
+          <option value="SMK" {% if data.program=='SMK' %}selected{% endif %}>SMK</option>
+          <option value="Tahfidz" {% if data.program=='Tahfidz' %}selected{% endif %}>Tahfidz</option>
+          <option value="Kitab" {% if data.program=='Kitab' %}selected{% endif %}>Kitab</option>
+          <option value="Umum" {% if data.program=='Umum' %}selected{% endif %}>Umum</option>
+          <option value="Lainnya" {% if data.program=='Lainnya' %}selected{% endif %}>Lainnya</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kelas Terakhir</label>
+        <input name="kelas_terakhir" class="form-input" placeholder="XII / Takhassus" value="{{ data.kelas_terakhir or '' }}">
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:20px;margin-top:16px;">
+    <div class="form-section">💼 Pendidikan & Karier</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Pendidikan Terakhir</label>
+        <select name="pendidikan_terakhir" class="form-select">
+          <option value="">— Pilih —</option>
+          {% for p in ['SD','SMP','SMA/SMK','D3','S1','S2','S3','Pesantren'] %}
+          <option value="{{ p }}" {% if data.pendidikan_terakhir==p %}selected{% endif %}>{{ p }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nama Instansi/Kampus</label>
+        <input name="nama_instansi" class="form-input" value="{{ data.nama_instansi or '' }}">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Pekerjaan</label>
+        <input name="pekerjaan" class="form-input" placeholder="Guru / Wirausaha / PNS..." value="{{ data.pekerjaan or '' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tempat Kerja</label>
+        <input name="tempat_kerja" class="form-input" value="{{ data.tempat_kerja or '' }}">
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:20px;margin-top:16px;">
+    <div class="form-section">👨‍👩‍👧 Data Orang Tua / Wali</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Nama Ayah</label>
+        <input name="nama_ayah" class="form-input" value="{{ data.nama_ayah or '' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nama Ibu</label>
+        <input name="nama_ibu" class="form-input" value="{{ data.nama_ibu or '' }}">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Pekerjaan Ayah</label>
+        <input name="pekerjaan_ayah" class="form-input" value="{{ data.pekerjaan_ayah or '' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pekerjaan Ibu</label>
+        <input name="pekerjaan_ibu" class="form-input" value="{{ data.pekerjaan_ibu or '' }}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">No. HP Ortu</label>
+      <input name="no_hp_ortu" class="form-input" placeholder="08xxxxxxxxxx" value="{{ data.no_hp_ortu or '' }}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Alamat Orang Tua</label>
+      <textarea name="alamat_ortu" class="form-textarea">{{ data.alamat_ortu or '' }}</textarea>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Provinsi Ortu</label>
+        <select name="provinsi_ortu" id="sel-provinsi-ortu" class="form-select" onchange="loadKota('sel-provinsi-ortu','sel-kota-ortu')">
+          <option value="">— Pilih Provinsi —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kota Ortu</label>
+        <select name="kota_ortu" id="sel-kota-ortu" class="form-select">
+          <option value="">— Pilih Kota —</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:20px;margin-top:16px;">
+    <div class="form-section">📝 Catatan</div>
+    <div class="form-group">
+      <textarea name="catatan" class="form-textarea" placeholder="Catatan tambahan...">{{ data.catatan or '' }}</textarea>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+    <a href="/admin/alumni" class="btn btn-ghost">Batal</a>
+    <button type="submit" class="btn btn-primary">💾 Simpan Data Alumni</button>
+  </div>
+
+</div>
+</div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let WILAYAH = null;
+
+async function loadWilayah() {
+  if (WILAYAH) return WILAYAH;
+  const r = await fetch('/static/wilayah.json');
+  WILAYAH = await r.json();
+  return WILAYAH;
+}
+
+async function initProvinsi(selId, savedValue) {
+  const w = await loadWilayah();
+  const sel = document.getElementById(selId);
+  w.provinsi.forEach(p => {
+    const opt = new Option(p, p, false, p === savedValue);
+    sel.appendChild(opt);
+  });
+}
+
+async function loadKota(provSelId, kotaSelId, savedKota) {
+  const w = await loadWilayah();
+  const prov = document.getElementById(provSelId).value;
+  const kotaSel = document.getElementById(kotaSelId);
+  kotaSel.innerHTML = '<option value="">— Pilih Kota —</option>';
+  if (!prov || !w.kota[prov]) return;
+  w.kota[prov].forEach(k => {
+    const opt = new Option(k, k, false, k === (savedKota || ''));
+    kotaSel.appendChild(opt);
+  });
+}
+
+(async () => {
+  const savedProv     = {{ data.provinsi | default('') | tojson }};
+  const savedKota     = {{ data.kota | default('') | tojson }};
+  const savedProvOrtu = {{ data.provinsi_ortu | default('') | tojson }};
+  const savedKotaOrtu = {{ data.kota_ortu | default('') | tojson }};
+
+  await initProvinsi('sel-provinsi', savedProv);
+  if (savedProv) await loadKota('sel-provinsi', 'sel-kota', savedKota);
+
+  await initProvinsi('sel-provinsi-ortu', savedProvOrtu);
+  if (savedProvOrtu) await loadKota('sel-provinsi-ortu', 'sel-kota-ortu', savedKotaOrtu);
+})();
+</script>
+{% endblock %}

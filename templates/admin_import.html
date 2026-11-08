@@ -1,0 +1,169 @@
+{% extends "base_admin.html" %}
+{% block title %}Import Alumni — Admin Al-Inayah{% endblock %}
+{% block page_title %}Import Alumni{% endblock %}
+{% block nav_alumni %}active{% endblock %}
+{% block nav_import %}active{% endblock %}
+
+{% block content %}
+{% if ok %}<div class="alert-ok">✅ {{ ok }}</div>{% endif %}
+{% if err %}<div class="alert-err">❌ {{ err }}</div>{% endif %}
+
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+  <a href="/admin/alumni" class="btn btn-ghost btn-sm">← Kembali</a>
+  <div style="font-size:16px;font-weight:800;">📥 Import Alumni dari Excel</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+  <!-- Langkah-langkah -->
+  <div>
+    <div class="card" style="padding:22px;">
+      <div style="font-size:14px;font-weight:800;margin-bottom:16px;">📋 Cara Import</div>
+
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#059669,#10b981);color:white;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;">Download Template</div>
+            <div style="font-size:12px;color:#64748b;margin-top:3px;">Download file template Excel, lalu isi data alumni sesuai kolom yang tersedia.</div>
+            <a href="/admin/alumni/template.xlsx" class="btn btn-ghost btn-sm" style="margin-top:8px;display:inline-flex;">
+              📄 Download Template Excel
+            </a>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#059669,#10b981);color:white;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;">Isi Data di Excel</div>
+            <div style="font-size:12px;color:#64748b;margin-top:3px;">Isi mulai baris ke-2 (baris ke-1 adalah judul). Kolom bertanda <strong>*</strong> wajib diisi. Jangan ubah urutan kolom.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#059669,#10b981);color:white;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;">Upload & Import</div>
+            <div style="font-size:12px;color:#64748b;margin-top:3px;">Upload file Excel yang sudah diisi di form sebelah kanan, lalu klik Import.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px;background:#f0fdf4;border:1px solid #a7f3d0;border-radius:10px;padding:12px 14px;font-size:12px;color:#15803d;line-height:1.7;">
+        ✅ <strong>Format tanggal lahir:</strong> YYYY-MM-DD (contoh: 2000-01-15)<br>
+        ✅ <strong>Kolom L/P:</strong> isi dengan huruf <strong>L</strong> (Ikhwan) atau <strong>P</strong> (Akhwat)<br>
+        ✅ <strong>No HP:</strong> awali dengan 0 (contoh: 081234567890)<br>
+        ✅ <strong>Foto</strong> tidak bisa diimport via Excel — upload satu per satu via Edit
+      </div>
+    </div>
+
+    <!-- Info kolom -->
+    <div class="card" style="padding:22px;margin-top:16px;overflow-x:auto;">
+      <div style="font-size:13px;font-weight:800;margin-bottom:12px;">📑 Daftar Kolom Template</div>
+      <table style="width:100%;font-size:12px;border-collapse:collapse;">
+        <thead>
+          <tr style="background:#f8fafc;">
+            <th style="padding:6px 10px;text-align:left;color:#64748b;font-size:10px;text-transform:uppercase;">No</th>
+            <th style="padding:6px 10px;text-align:left;color:#64748b;font-size:10px;text-transform:uppercase;">Kolom</th>
+            <th style="padding:6px 10px;text-align:left;color:#64748b;font-size:10px;text-transform:uppercase;">Keterangan</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in [
+            ('1','Nama Lengkap*','Wajib diisi'),
+            ('2','Nama Panggilan','Opsional'),
+            ('3','L/P','L = Ikhwan, P = Akhwat'),
+            ('4','Tempat Lahir',''),
+            ('5','Tanggal Lahir','Format: YYYY-MM-DD'),
+            ('6','Tahun Masuk','Angka, contoh: 2015'),
+            ('7','Tahun Keluar','Angka, contoh: 2020'),
+            ('8','Angkatan','Angka, contoh: 12'),
+            ('9','Program','Tahfidz / Kitab / Umum'),
+            ('10','Kelas Terakhir','contoh: XII'),
+            ('11','No Induk',''),
+            ('12','No HP','Awali 0'),
+            ('13–31','...','Lihat template'),
+          ] %}
+          <tr style="border-top:1px solid #f1f5f9;">
+            <td style="padding:6px 10px;color:#94a3b8;">{{ row[0] }}</td>
+            <td style="padding:6px 10px;font-weight:600;">{{ row[1] }}</td>
+            <td style="padding:6px 10px;color:#64748b;">{{ row[2] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Form Upload -->
+  <div>
+    <div class="card" style="padding:22px;">
+      <div style="font-size:14px;font-weight:800;margin-bottom:18px;">📤 Upload File Excel</div>
+      <form method="post" enctype="multipart/form-data" id="form-import">
+        <div class="form-group">
+          <label class="form-label">File Excel (.xlsx)</label>
+          <input type="file" name="file" accept=".xlsx" class="form-input" required id="file-input"
+                 onchange="previewFile(this)">
+          <div id="file-preview" style="margin-top:8px;font-size:12px;color:#64748b;display:none;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Jika ada data duplikat (nama + tahun masuk sama)</label>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:500;">
+              <input type="radio" name="mode" value="skip" checked> Lewati (skip) — data lama tetap
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:500;">
+              <input type="radio" name="mode" value="update"> Perbarui (update) — data lama ditimpa
+            </label>
+          </div>
+        </div>
+
+        <div id="progress-wrap" style="display:none;margin:12px 0;">
+          <div style="font-size:12px;color:#64748b;margin-bottom:6px;">Sedang memproses...</div>
+          <div style="height:6px;background:#f1f5f9;border-radius:4px;overflow:hidden;">
+            <div id="progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#059669,#10b981);border-radius:4px;transition:width .3s;animation:progress-anim 1.5s ease infinite;"></div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;" id="btn-import">
+          📥 Import Sekarang
+        </button>
+      </form>
+
+      <div style="margin-top:20px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px 14px;font-size:12px;color:#c2410c;line-height:1.7;">
+        ⚠️ <strong>Perhatian:</strong><br>
+        • Baris kosong akan diabaikan otomatis<br>
+        • Baris tanpa nama lengkap akan dilewati<br>
+        • Proses import tidak bisa dibatalkan setelah dimulai<br>
+        • Disarankan backup data (Export Excel) sebelum import massal
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+@keyframes progress-anim {
+  0% { width: 20%; }
+  50% { width: 80%; }
+  100% { width: 20%; }
+}
+</style>
+<script>
+function previewFile(input) {
+  const preview = document.getElementById('file-preview');
+  if (input.files && input.files[0]) {
+    const f = input.files[0];
+    const size = (f.size / 1024).toFixed(1);
+    preview.style.display = 'block';
+    preview.innerHTML = `📄 <strong>${f.name}</strong> — ${size} KB`;
+  }
+}
+document.getElementById('form-import').addEventListener('submit', function() {
+  document.getElementById('progress-wrap').style.display = 'block';
+  document.getElementById('btn-import').disabled = true;
+  document.getElementById('btn-import').textContent = 'Memproses...';
+});
+</script>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}{{ alumni.nama_lengkap }} — Alumni Al-Inayah{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-header {
+  background: linear-gradient(135deg,#064e3b,#059669);
+  padding: 32px 20px; text-align: center; color: white;
+}
+.profile-avatar {
+  width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 14px;
+  background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: 800; border: 3px solid rgba(255,255,255,.4); overflow: hidden;
+}
+.profile-avatar img { width: 90px; height: 90px; object-fit: cover; }
+.info-row { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; min-width: 130px; flex-shrink: 0; }
+.info-val { font-size: 13px; color: #0f172a; font-weight: 500; }
+.section-head { font-size: 12px; font-weight: 800; color: #059669; text-transform: uppercase; letter-spacing: .5px; margin: 20px 0 10px; padding-bottom: 6px; border-bottom: 2px solid #f0fdf4; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="profile-header">
+  <div class="profile-avatar">
+    {% if alumni.foto %}
+      <img src="/static/foto_alumni/{{ alumni.foto }}" alt="{{ alumni.nama_lengkap }}">
+    {% else %}
+      {{ alumni.nama_lengkap[0]|upper }}
+    {% endif %}
+  </div>
+  <div style="font-size:20px;font-weight:900;">{{ alumni.nama_lengkap }}</div>
+  {% if alumni.nama_panggilan %}<div style="font-size:13px;opacity:.8;margin-top:3px;">{{ alumni.nama_panggilan }}</div>{% endif %}
+  <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap;">
+    {% if alumni.jenis_kelamin == 'L' %}<span class="badge badge-l">Ikhwan</span>{% elif alumni.jenis_kelamin == 'P' %}<span class="badge badge-p">Akhwat</span>{% endif %}
+    {% if alumni.program %}<span class="badge" style="background:rgba(255,255,255,.2);color:white;">{{ alumni.program }}</span>{% endif %}
+    {% if alumni.angkatan %}<span class="badge" style="background:rgba(255,255,255,.2);color:white;">Angkatan {{ alumni.angkatan }}</span>{% endif %}
+  </div>
+</div>
+
+<div class="container" style="padding-top:24px;max-width:680px;">
+  <a href="/direktori" style="font-size:13px;color:#059669;font-weight:600;">← Kembali ke Direktori</a>
+
+  <div class="card" style="padding:20px;margin-top:16px;">
+
+    <div class="section-head">🕌 Data Pesantren</div>
+    {% if alumni.no_induk %}<div class="info-row"><div class="info-label">No. Induk</div><div class="info-val">{{ alumni.no_induk }}</div></div>{% endif %}
+    {% if alumni.tahun_masuk %}<div class="info-row"><div class="info-label">Tahun Masuk</div><div class="info-val">{{ alumni.tahun_masuk }}</div></div>{% endif %}
+    {% if alumni.tahun_keluar %}<div class="info-row"><div class="info-label">Tahun Keluar</div><div class="info-val">{{ alumni.tahun_keluar }}</div></div>{% endif %}
+    {% if alumni.kelas_terakhir %}<div class="info-row"><div class="info-label">Kelas Terakhir</div><div class="info-val">{{ alumni.kelas_terakhir }}</div></div>{% endif %}
+
+    <div class="section-head">👤 Data Pribadi</div>
+    {% if alumni.tempat_lahir or alumni.tanggal_lahir %}
+    <div class="info-row"><div class="info-label">Tempat/Tgl Lahir</div><div class="info-val">{{ alumni.tempat_lahir }}{% if alumni.tanggal_lahir %}, {{ alumni.tanggal_lahir }}{% endif %}</div></div>
+    {% endif %}
+
+    <div class="section-head">📍 Domisili</div>
+    {% if alumni.kota %}<div class="info-row"><div class="info-label">Kota</div><div class="info-val">{{ alumni.kota }}{% if alumni.provinsi %}, {{ alumni.provinsi }}{% endif %}</div></div>{% endif %}
+    {% if alumni.kecamatan %}<div class="info-row"><div class="info-label">Kecamatan</div><div class="info-val">{{ alumni.kecamatan }}</div></div>{% endif %}
+    {% if alumni.desa %}<div class="info-row"><div class="info-label">Desa/Kelurahan</div><div class="info-val">{{ alumni.desa }}</div></div>{% endif %}
+    {% if alumni.alamat %}<div class="info-row"><div class="info-label">Alamat</div><div class="info-val">{{ alumni.alamat }}</div></div>{% endif %}
+
+    <div class="section-head">💼 Pendidikan & Karier</div>
+    {% if alumni.pendidikan_terakhir %}<div class="info-row"><div class="info-label">Pendidikan</div><div class="info-val">{{ alumni.pendidikan_terakhir }}{% if alumni.nama_instansi %} — {{ alumni.nama_instansi }}{% endif %}</div></div>{% endif %}
+    {% if alumni.pekerjaan %}<div class="info-row"><div class="info-label">Pekerjaan</div><div class="info-val">{{ alumni.pekerjaan }}{% if alumni.tempat_kerja %} · {{ alumni.tempat_kerja }}{% endif %}</div></div>{% endif %}
+
+    {% if alumni.no_hp or alumni.instagram or alumni.facebook %}
+    <div class="section-head">📱 Kontak</div>
+    {% if alumni.no_hp %}<div class="info-row"><div class="info-label">WhatsApp</div><div class="info-val"><a href="https://wa.me/{{ alumni.no_hp|replace('0','62',1) }}" style="color:#059669;font-weight:700;">{{ alumni.no_hp }}</a></div></div>{% endif %}
+    {% if alumni.instagram %}<div class="info-row"><div class="info-label">Instagram</div><div class="info-val">{{ alumni.instagram }}</div></div>{% endif %}
+    {% if alumni.facebook %}<div class="info-row"><div class="info-label">Facebook</div><div class="info-val">{{ alumni.facebook }}</div></div>{% endif %}
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base_admin.html" %}
+{% block title %}Verifikasi Alumni — Admin Al-Inayah{% endblock %}
+{% block page_title %}Verifikasi Pendaftar{% endblock %}
+{% block nav_pending %}active{% endblock %}
+
+{% block content %}
+{% if ok %}<div class="alert-ok">✅ {{ ok }}</div>{% endif %}
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+  <div style="font-size:18px;font-weight:900;">
+    📋 Menunggu Verifikasi
+    {% if pending_count > 0 %}
+      <span style="background:#ef4444;color:white;border-radius:20px;font-size:12px;padding:2px 10px;margin-left:6px;">{{ pending_count }}</span>
+    {% endif %}
+  </div>
+</div>
+
+{% if not pending_list %}
+<div style="text-align:center;padding:80px 20px;color:#94a3b8;">
+  <div style="font-size:56px;margin-bottom:12px;">✅</div>
+  <div style="font-size:16px;font-weight:700;margin-bottom:4px;">Tidak ada pendaftar menunggu</div>
+  <div style="font-size:13px;">Semua pendaftaran sudah diproses</div>
+</div>
+{% else %}
+<div style="display:flex;flex-direction:column;gap:14px;">
+  {% for a in pending_list %}
+  <div class="card" style="padding:20px;">
+    <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+
+      <!-- Avatar -->
+      <div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#fbbf24);display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:20px;flex-shrink:0;">
+        {{ a.nama_lengkap[0]|upper }}
+      </div>
+
+      <!-- Info -->
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:15px;font-weight:800;color:#0f172a;">{{ a.nama_lengkap }}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px;">
+          {% if a.nama_panggilan %}{{ a.nama_panggilan }} · {% endif %}
+          {% if a.jenis_kelamin == 'L' %}<span class="badge badge-l">Ikhwan</span>{% elif a.jenis_kelamin == 'P' %}<span class="badge badge-p">Akhwat</span>{% endif %}
+        </div>
+
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;">
+          {% if a.angkatan or a.program %}
+          <div style="font-size:12px;">
+            🕌 {% if a.angkatan %}Angkatan {{ a.angkatan }}{% endif %}
+            {% if a.program %} · {{ a.program }}{% endif %}
+            {% if a.tahun_masuk or a.tahun_keluar %}
+              ({{ a.tahun_masuk or '?' }}–{{ a.tahun_keluar or '?' }})
+            {% endif %}
+          </div>
+          {% endif %}
+          {% if a.no_hp %}
+          <div style="font-size:12px;">📱 {{ a.no_hp }}</div>
+          {% endif %}
+          {% if a.kota or a.provinsi %}
+          <div style="font-size:12px;">📍 {{ [a.kota, a.provinsi]|select|join(', ') }}</div>
+          {% endif %}
+          {% if a.pekerjaan %}
+          <div style="font-size:12px;">💼 {{ a.pekerjaan }}</div>
+          {% endif %}
+          {% if a.email %}
+          <div style="font-size:12px;">✉️ {{ a.email }}</div>
+          {% endif %}
+        </div>
+
+        {% if a.nama_ayah or a.nama_ibu %}
+        <div style="font-size:12px;color:#94a3b8;margin-top:6px;">
+          Ortu: {{ [a.nama_ayah, a.nama_ibu]|select|join(' / ') }}
+        </div>
+        {% endif %}
+
+        <div style="font-size:11px;color:#cbd5e1;margin-top:6px;">Daftar: {{ a.created_at | ts }}</div>
+      </div>
+
+      <!-- Aksi -->
+      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
+        <form method="post" action="/admin/alumni/{{ a.id }}/approve">
+          <button type="submit" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;">
+            ✅ Setujui
+          </button>
+        </form>
+        <a href="/admin/alumni/{{ a.id }}/edit" class="btn btn-ghost btn-sm" style="justify-content:center;">
+          ✏️ Edit dulu
+        </a>
+        <form method="post" action="/admin/alumni/{{ a.id }}/tolak"
+              onsubmit="return confirm('Tolak pendaftaran {{ a.nama_lengkap }}?')">
+          <button type="submit" class="btn btn-danger btn-sm" style="width:100%;justify-content:center;">
+            ❌ Tolak
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

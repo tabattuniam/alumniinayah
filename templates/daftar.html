@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block title %}Daftar Alumni — Al-Inayah{% endblock %}
+
+{% block extra_css %}
+<style>
+.reg-wrap {
+  max-width: 680px; margin: 0 auto; padding: 32px 16px 60px;
+}
+.reg-header {
+  text-align: center; margin-bottom: 28px;
+}
+.reg-header .icon { font-size: 48px; margin-bottom: 8px; }
+.reg-header h1 { font-size: 20px; font-weight: 900; color: #0f172a; margin-bottom: 4px; }
+.reg-header p { font-size: 13px; color: #64748b; line-height: 1.6; }
+
+.section-card {
+  background: white; border-radius: 18px;
+  box-shadow: 0 1px 10px rgba(0,0,0,.07);
+  padding: 22px 20px; margin-bottom: 16px;
+}
+.section-label {
+  font-size: 11px; font-weight: 800; color: #059669;
+  text-transform: uppercase; letter-spacing: .6px;
+  margin-bottom: 16px; padding-bottom: 8px;
+  border-bottom: 2px solid #f0fdf4;
+}
+.f2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 500px) { .f2 { grid-template-columns: 1fr; } }
+
+.note-box {
+  background: #f0fdf4; border: 1.5px solid #a7f3d0;
+  border-radius: 12px; padding: 14px 16px;
+  font-size: 12px; color: #15803d; line-height: 1.7;
+  margin-bottom: 20px;
+}
+.note-box strong { font-weight: 800; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="reg-wrap">
+
+  <div class="reg-header">
+    <div class="icon">📝</div>
+    <h1>Daftar sebagai Alumni</h1>
+    <p>Isi data diri Anda. Setelah dikirim, admin pesantren akan memverifikasi<br>dan data Anda akan tampil di direktori alumni.</p>
+  </div>
+
+  {% if ok %}
+  <div style="background:#f0fdf4;border:2px solid #6ee7b7;border-radius:16px;padding:24px;text-align:center;margin-bottom:24px;">
+    <div style="font-size:40px;margin-bottom:10px;">✅</div>
+    <div style="font-size:15px;font-weight:800;color:#059669;margin-bottom:4px;">Pendaftaran Terkirim!</div>
+    <div style="font-size:13px;color:#15803d;">{{ ok }}</div>
+    <a href="/direktori" class="btn btn-primary" style="margin-top:16px;">Lihat Direktori Alumni</a>
+  </div>
+  {% else %}
+
+  {% if err %}
+  <div class="alert-err">❌ {{ err }}</div>
+  {% endif %}
+
+  <div class="note-box">
+    📋 <strong>Petunjuk:</strong> Isi minimal nama lengkap, program, dan no. HP.<br>
+    Data bintang (<strong>*</strong>) wajib diisi. Data lain boleh diisi nanti.
+  </div>
+
+  <form method="post">
+
+    <!-- Data Pribadi -->
+    <div class="section-card">
+      <div class="section-label">👤 Data Pribadi</div>
+      <div class="f2">
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap *</label>
+          <input name="nama_lengkap" class="form-input" placeholder="Nama sesuai ijazah" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nama Panggilan</label>
+          <input name="nama_panggilan" class="form-input" placeholder="Nama panggilan">
+        </div>
+      </div>
+      <div class="f2">
+        <div class="form-group">
+          <label class="form-label">Jenis Kelamin</label>
+          <select name="jenis_kelamin" class="form-select">
+            <option value="">— Pilih —</option>
+            <option value="L">Ikhwan (L)</option>
+            <option value="P">Akhwat (P)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tempat Lahir</label>
+          <input name="tempat_lahir" class="form-input" placeholder="Kota tempat lahir">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tanggal Lahir</label>
+        <input type="date" name="tanggal_lahir" class="form-input">
+      </div>
+    </div>
+
+    <!-- Data Pesantren -->
+    <div class="section-card">
+      <div class="section-label">🕌 Data Pesantren</div>
+      <div class="f2">
+        <div class="form-group">
+          <label class="form-label">Tahun Masuk</label>
+          <input type="number" name="tahun_masuk" class="form-input" placeholder="2015">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tahun Keluar</label>
+          <input type="number" name="tahun_keluar" class="form-input" placeholder="2020">
+        </div>
+      </div>
+      <div class="f2">
+        <div class="form-group">
+          <label class="form-label">Angkatan ke-</label>
+          <input type="number" name="angkatan" class="form-input" placeholder="12">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Program *</label>
+          <select name="program" class="form-select" required>
+            <option value="">— Pilih Program —</option>
+            <option value="SMP">SMP</option>
+            <option value="MTS">MTS</option>
+            <option value="SMK">SMK</option>
+            <option value="Tahfidz">Tahfidz</option>
+            <option value="Kitab">Kitab</option>
+            <option value="Umum">Umum</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kontak & Domisili -->
+    <div class="section-card">
+      <div class="section-label">📱 Kontak & Domisili</div>
+      <div class="f2">
+        <div class="form-group">
+          <label class="form-label">No. HP / WA *</label>
+          <input name="no_hp" class="form-input" placeholder="08xxxxxxxxxx" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-input" placeholder="email@gmail.com">
+        </div>
+      </div>
+      <div class="f2">
+        <div class="form-group">
+          <label class="form-label">Provinsi</label>
+          <select name="provinsi" id="sel-provinsi" class="form-select" onchange="loadKota('sel-provinsi','sel-kota')">
+            <option value="">— Pilih Provinsi —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kab / Kota</label>
+          <select name="kota" id="sel-kota" class="form-select">
+            <option value="">— Pilih Kota —</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Desa / Kelurahan</label>
+        <input name="desa" class="form-input" placeholder="Nama desa/kelurahan">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kecamatan</label>
+        <input name="kecamatan" class="form-input" placeholder="Nama kecamatan">
+      </div>
+    </div>
+
+    <!-- Pekerjaan -->
+    <div class="section-card">
+      <div class="section-label">💼 Pekerjaan Sekarang</div>
+      <div class="form-group">
+        <label class="form-label">Pekerjaan</label>
+        <input name="pekerjaan" class="form-input" placeholder="Guru / Wirausaha / Mahasiswa...">
+      </div>
+    </div>
+
+    <!-- Data Orang Tua -->
+    <div class="section-card">
+      <div class="section-label">👨‍👩‍👧 Data Orang Tua (Opsional)</div>
+      <div class="f2">
+        <div class="form-group">
+          <label class="form-label">Nama Ayah</label>
+          <input name="nama_ayah" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nama Ibu</label>
+          <input name="nama_ibu" class="form-input">
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;font-size:15px;padding:14px;">
+      📨 Kirim Pendaftaran
+    </button>
+
+    <div style="text-align:center;margin-top:14px;font-size:12px;color:#94a3b8;">
+      Sudah terdaftar sebelumnya? <a href="/direktori" style="color:#059669;font-weight:700;">Cek di Direktori</a>
+    </div>
+  </form>
+
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let WILAYAH = null;
+async function loadWilayah() {
+  if (WILAYAH) return WILAYAH;
+  const r = await fetch('/static/wilayah.json');
+  WILAYAH = await r.json();
+  return WILAYAH;
+}
+async function initProvinsi(selId) {
+  const w = await loadWilayah();
+  const sel = document.getElementById(selId);
+  w.provinsi.forEach(p => sel.appendChild(new Option(p, p)));
+}
+async function loadKota(provSelId, kotaSelId) {
+  const w = await loadWilayah();
+  const prov = document.getElementById(provSelId).value;
+  const kotaSel = document.getElementById(kotaSelId);
+  kotaSel.innerHTML = '<option value="">— Pilih Kota —</option>';
+  if (!prov || !w.kota[prov]) return;
+  w.kota[prov].forEach(k => kotaSel.appendChild(new Option(k, k)));
+}
+initProvinsi('sel-provinsi');
+</script>
+{% endblock %}

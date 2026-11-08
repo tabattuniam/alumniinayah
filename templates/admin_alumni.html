@@ -1,0 +1,92 @@
+{% extends "base_admin.html" %}
+{% block title %}Data Alumni — Admin Alumni Al-Inayah{% endblock %}
+{% block page_title %}Data Alumni{% endblock %}
+{% block nav_alumni %}active{% endblock %}
+
+{% block content %}
+{% if ok %}<div class="alert-ok">✅ {{ ok }}</div>{% endif %}
+{% if err %}<div class="alert-err">❌ {{ err }}</div>{% endif %}
+
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+  <div style="font-size:22px;font-weight:900;">{{ alumni_list|length }} Alumni</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <a href="/admin/alumni/export.xlsx" class="btn btn-ghost btn-sm">📥 Export</a>
+    <a href="/admin/alumni/import" class="btn btn-ghost btn-sm">📤 Import Excel</a>
+    <a href="/admin/alumni/tambah" class="btn btn-primary btn-sm">+ Tambah Alumni</a>
+  </div>
+</div>
+
+<!-- Filter -->
+<form method="get" style="background:white;padding:14px;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:16px;">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <input name="q" value="{{ q }}" class="form-input" placeholder="🔍 Cari nama / no induk / kota..." style="flex:1;min-width:160px;">
+    <select name="angkatan" class="form-select" style="min-width:130px;">
+      <option value="">Semua Angkatan</option>
+      {% for a in angkatan_list %}
+      <option value="{{ a }}" {% if angkatan == a|string %}selected{% endif %}>Angkatan {{ a }}</option>
+      {% endfor %}
+    </select>
+    <select name="program" class="form-select" style="min-width:120px;">
+      <option value="">Semua Program</option>
+      <option value="Tahfidz" {% if program=='Tahfidz' %}selected{% endif %}>Tahfidz</option>
+      <option value="Kitab" {% if program=='Kitab' %}selected{% endif %}>Kitab</option>
+      <option value="Umum" {% if program=='Umum' %}selected{% endif %}>Umum</option>
+    </select>
+    <button type="submit" class="btn btn-primary btn-sm">Cari</button>
+  </div>
+</form>
+
+<!-- Tabel -->
+<div class="card" style="overflow-x:auto;">
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Angkatan</th>
+        <th>Program</th>
+        <th>Kota</th>
+        <th>No HP</th>
+        <th>Pekerjaan</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if not alumni_list %}
+      <tr><td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">Belum ada data alumni</td></tr>
+      {% endif %}
+      {% for a in alumni_list %}
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:34px;height:34px;border-radius:8px;flex-shrink:0;overflow:hidden;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px;">
+              {% if a.foto %}
+                <img src="/static/foto_alumni/{{ a.foto }}" style="width:34px;height:34px;object-fit:cover;">
+              {% else %}
+                {{ a.nama_lengkap[0]|upper }}
+              {% endif %}
+            </div>
+            <div>
+              <div style="font-weight:700;color:#0f172a;">{{ a.nama_lengkap }}</div>
+              {% if a.nama_panggilan %}<div style="font-size:11px;color:#94a3b8;">{{ a.nama_panggilan }}</div>{% endif %}
+            </div>
+          </div>
+        </td>
+        <td>{% if a.angkatan %}<span class="badge" style="background:#f0fdf4;color:#059669;">{{ a.angkatan }}</span>{% else %}—{% endif %}</td>
+        <td>{{ a.program or '—' }}</td>
+        <td>{{ a.kota or '—' }}</td>
+        <td>{% if a.no_hp %}<a href="https://wa.me/{{ a.no_hp|replace('0','62',1) }}" style="color:#059669;font-weight:600;">{{ a.no_hp }}</a>{% else %}—{% endif %}</td>
+        <td>{{ a.pekerjaan or '—' }}</td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <a href="/admin/alumni/{{ a.id }}/edit" class="btn btn-ghost btn-sm">✏️</a>
+            <form method="post" action="/admin/alumni/{{ a.id }}/hapus" onsubmit="return confirm('Hapus alumni {{ a.nama_lengkap }}?')">
+              <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

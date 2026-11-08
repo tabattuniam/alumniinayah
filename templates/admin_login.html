@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
+<title>Login Admin — Alumni Al-Inayah</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(160deg,#022c22,#064e3b,#059669); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.box { background: white; border-radius: 20px; padding: 32px; width: 100%; max-width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.logo { text-align: center; margin-bottom: 24px; }
+.logo-icon { font-size: 48px; }
+.logo-title { font-size: 18px; font-weight: 900; color: #0f172a; margin-top: 8px; }
+.logo-sub { font-size: 12px; color: #64748b; margin-top: 3px; }
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 5px; }
+.form-input { width: 100%; padding: 11px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-family: inherit; transition: all .15s; }
+.form-input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,.1); }
+.btn-submit { width: 100%; padding: 12px; background: linear-gradient(135deg,#059669,#10b981); color: white; font-weight: 800; font-size: 14px; border: none; border-radius: 11px; cursor: pointer; font-family: inherit; margin-top: 8px; }
+.btn-submit:hover { box-shadow: 0 6px 20px rgba(5,150,105,.35); }
+.err { background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #dc2626; font-weight: 600; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">
+    <div class="logo-icon">🕌</div>
+    <div class="logo-title">Alumni Al-Inayah</div>
+    <div class="logo-sub">Panel Admin</div>
+  </div>
+  {% if err %}<div class="err">❌ {{ err }}</div>{% endif %}
+  <form method="post">
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input name="username" class="form-input" placeholder="admin" autocomplete="username" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" name="password" class="form-input" placeholder="••••••••" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn-submit">🔐 Masuk</button>
+  </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Beranda — Alumni Pondok Pesantren Al-Inayah{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero {
+  background: linear-gradient(160deg, #022c22 0%, #064e3b 50%, #059669 100%);
+  padding: 60px 20px 80px; text-align: center; color: white; position: relative; overflow: hidden;
+}
+.hero::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 50px;
+  background: #f8fafc; border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+.hero h1 { font-size: 28px; font-weight: 900; margin-bottom: 10px; line-height: 1.2; }
+.hero p { font-size: 14px; opacity: .85; max-width: 480px; margin: 0 auto; line-height: 1.7; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: -30px 0 32px; position: relative; z-index: 1; }
+.stat-card { background: white; border-radius: 16px; padding: 18px 14px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,.1); }
+.stat-num { font-size: 28px; font-weight: 900; color: #059669; }
+.stat-lbl { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
+
+.section-title { font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+.peng-item { padding: 14px; border-bottom: 1px solid #f1f5f9; }
+.peng-item:last-child { border-bottom: none; }
+.peng-judul { font-size: 14px; font-weight: 700; color: #0f172a; }
+.peng-tanggal { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+.peng-isi { font-size: 12px; color: #475569; margin-top: 6px; line-height: 1.6; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="hero">
+  <div style="font-size:52px;margin-bottom:12px;">🕌</div>
+  <h1>Alumni Pondok Pesantren<br>Al-Inayah</h1>
+  <p>Silaturahmi sesama alumni, direktori kontak, dan informasi terkini dari pesantren.</p>
+  <div style="margin-top:24px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+    <a href="/direktori" style="background:white;color:#059669;padding:12px 24px;border-radius:12px;font-weight:800;font-size:14px;">🔍 Cari Alumni</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-num">{{ stats.total }}</div>
+      <div class="stat-lbl">Total Alumni</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ stats.per_angkatan|length }}</div>
+      <div class="stat-lbl">Angkatan</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ stats.per_provinsi|length }}</div>
+      <div class="stat-lbl">Provinsi</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+    <!-- Pengumuman -->
+    <div>
+      <div class="section-title">📣 Pengumuman</div>
+      <div class="card">
+        {% if pengumuman %}
+          {% for p in pengumuman %}
+          <div class="peng-item">
+            <div class="peng-judul">{{ p.judul }}</div>
+            <div class="peng-tanggal">{{ p.created_at | ts }}</div>
+            <div class="peng-isi">{{ p.isi[:200] }}{% if p.isi|length > 200 %}...{% endif %}</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div style="padding:32px;text-align:center;color:#94a3b8;font-size:13px;">Belum ada pengumuman</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Statistik -->
+    <div>
+      <div class="section-title">📊 Sebaran Angkatan</div>
+      <div class="card" style="padding:16px;">
+        {% if stats.per_angkatan %}
+          {% for a in stats.per_angkatan[:8] %}
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <div style="font-size:12px;font-weight:700;color:#0f172a;min-width:80px;">Angkatan {{ a.angkatan }}</div>
+            <div style="flex:1;height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden;">
+              <div style="height:100%;width:{{ [(a.jml / stats.total * 100)|int, 100]|min }}%;background:linear-gradient(90deg,#059669,#10b981);border-radius:4px;"></div>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:#059669;min-width:24px;text-align:right;">{{ a.jml }}</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div style="text-align:center;color:#94a3b8;font-size:13px;padding:20px;">Belum ada data</div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

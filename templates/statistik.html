@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Statistik Alumni — Al-Inayah{% endblock %}
+
+{% block extra_css %}
+<style>
+.wrap { max-width: 960px; margin: 0 auto; padding: 10px 12px 24px; }
+
+.chips { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 8px; }
+@media (max-width:600px) { .chips { grid-template-columns: repeat(4,1fr); } }
+.chip {
+  background: white; border-radius: 12px; padding: 10px 6px;
+  text-align: center; box-shadow: 0 1px 6px rgba(0,0,0,.06);
+}
+.chip .num { font-size: 20px; font-weight: 900; color: #059669; line-height: 1; }
+.chip .lbl { font-size: 9px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+@media (max-width:640px) { .grid2 { grid-template-columns: 1fr; } }
+
+.card {
+  background: white; border-radius: 12px;
+  padding: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.06);
+}
+.card-title { font-size: 11px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+
+.bar-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.bar-label { font-size: 11px; font-weight: 700; color: #334155; min-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-wrap { flex: 1; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; }
+.bar-num { font-size: 11px; font-weight: 800; color: #059669; min-width: 24px; text-align: right; }
+
+.pill-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill {
+  background: #f0fdf4; border: 1px solid #a7f3d0;
+  border-radius: 20px; padding: 4px 10px;
+  font-size: 11px; font-weight: 700; color: #059669;
+  display: flex; align-items: center; gap: 5px;
+}
+.pill .cnt { background: #059669; color: white; border-radius: 20px; padding: 0 6px; font-size: 10px; }
+
+.empty { text-align:center; color:#94a3b8; padding:20px; font-size:12px; }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div style="background:linear-gradient(135deg,#064e3b,#059669);padding:20px 20px 36px;text-align:center;color:white;">
+  <div style="font-size:30px;margin-bottom:4px;">📊</div>
+  <div style="font-size:17px;font-weight:900;">Statistik Alumni Al-Inayah</div>
+  <div style="font-size:12px;opacity:.8;margin-top:2px;">Sebaran alumni berdasarkan tahun masuk, program & wilayah</div>
+</div>
+
+<div class="wrap" style="margin-top:-20px;position:relative;z-index:1;">
+
+  <!-- Summary chips -->
+  <div class="chips">
+    <div class="chip">
+      <div class="num">{{ stats.total }}</div>
+      <div class="lbl">Total Alumni</div>
+    </div>
+    <div class="chip">
+      <div class="num">{{ stats.per_angkatan | length }}</div>
+      <div class="lbl">Tahun Masuk</div>
+    </div>
+    <div class="chip">
+      <div class="num">{{ stats.per_provinsi | length }}</div>
+      <div class="lbl">Provinsi</div>
+    </div>
+    <div class="chip">
+      <div class="num">{{ stats.per_program | length }}</div>
+      <div class="lbl">Program</div>
+    </div>
+  </div>
+
+  <!-- Row 1: Grafik tahun masuk + program -->
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">📅 Tahun Masuk</div>
+      {% if stats.per_angkatan %}
+        {% set max_jml = stats.per_angkatan | map(attribute='jml') | max %}
+        {% for a in stats.per_angkatan | sort(attribute='angkatan', reverse=True) %}
+        <div class="bar-row">
+          <div class="bar-label">{{ a.angkatan }}</div>
+          <div class="bar-wrap">
+            <div class="bar-fill" style="width:{{ (a.jml / max_jml * 100)|int }}%;background:#059669;"></div>
+          </div>
+          <div class="bar-num">{{ a.jml }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty">Belum ada data</div>
+      {% endif %}
+    </div>
+    <div class="card">
+      <div class="card-title">🕌 Program</div>
+      {% if stats.per_program %}
+        {% set max_prog = stats.per_program[0].jml %}
+        {% set prog_colors = {'SMP':'#d97706','MTS':'#dc2626','SMK':'#0369a1','Tahfidz':'#059669','Kitab':'#0891b2','Umum':'#7c3aed','Lainnya':'#64748b'} %}
+        {% for p in stats.per_program %}
+        <div class="bar-row">
+          <div class="bar-label">{{ p.program }}</div>
+          <div class="bar-wrap">
+            <div class="bar-fill" style="width:{{ (p.jml / max_prog * 100)|int }}%;background:{{ prog_colors.get(p.program, '#64748b') }};"></div>
+          </div>
+          <div class="bar-num">{{ p.jml }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty">Belum ada data</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Row 2: Provinsi + Pekerjaan -->
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">🗺️ Top Provinsi</div>
+      {% if stats.per_provinsi %}
+        {% set max_jml = stats.per_provinsi[0].jml %}
+        {% set colors = ['#059669','#0891b2','#7c3aed','#dc2626','#d97706','#64748b','#16a34a','#be123c','#0369a1','#a16207'] %}
+        {% for p in stats.per_provinsi[:10] %}
+        <div class="bar-row">
+          <div class="bar-label">{{ p.provinsi | replace('Daerah Istimewa ','DI ') | replace('Daerah Khusus Ibukota ','DKI ') }}</div>
+          <div class="bar-wrap">
+            <div class="bar-fill" style="width:{{ (p.jml / max_jml * 100)|int }}%;background:{{ colors[loop.index0 % 10] }};"></div>
+          </div>
+          <div class="bar-num">{{ p.jml }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty">Belum ada data</div>
+      {% endif %}
+    </div>
+    <div class="card">
+      <div class="card-title">💼 Profesi Alumni</div>
+      {% if stats.per_pekerjaan %}
+        <div class="pill-wrap">
+          {% for p in stats.per_pekerjaan %}
+          <div class="pill">{{ p.pekerjaan }}<span class="cnt">{{ p.jml }}</span></div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty">Belum ada data</div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+{% block title %}Direktori Alumni — Al-Inayah{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Search bar */
+.search-wrap {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.08);
+  margin-bottom: 24px;
+}
+.search-wrap .search-row {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.search-wrap input[type=text] {
+  flex: 1; min-width: 200px;
+  background: #f8fafc; border: 1.5px solid #e2e8f0;
+  padding: 10px 16px; border-radius: 12px;
+  font-size: 14px; transition: all .15s;
+}
+.search-wrap input[type=text]:focus {
+  outline: none; border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(5,150,105,.1);
+  background: white;
+}
+.search-wrap select {
+  background: #f8fafc; border: 1.5px solid #e2e8f0;
+  padding: 10px 14px; border-radius: 12px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  min-width: 140px; transition: all .15s;
+}
+.search-wrap select:focus { outline: none; border-color: #059669; }
+
+/* Stat chips */
+.stat-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.stat-chip {
+  background: white; border-radius: 12px;
+  padding: 10px 18px; font-size: 13px; font-weight: 700;
+  box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  display: flex; align-items: center; gap: 8px;
+}
+.stat-chip .num { font-size: 20px; font-weight: 900; color: #059669; }
+
+/* Alumni grid */
+.alumni-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.alumni-card {
+  background: white; border-radius: 18px;
+  padding: 22px 18px 18px;
+  box-shadow: 0 1px 8px rgba(0,0,0,.06);
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; transition: all .2s;
+  border: 1.5px solid transparent; cursor: pointer;
+  text-decoration: none; color: inherit;
+}
+.alumni-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 32px rgba(5,150,105,.15);
+  border-color: #6ee7b7;
+}
+
+/* Avatar */
+.avatar-wrap { position: relative; margin-bottom: 12px; }
+.avatar {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: linear-gradient(135deg,#059669,#10b981);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 900; color: white;
+  margin: 0 auto; overflow: hidden;
+  box-shadow: 0 4px 12px rgba(5,150,105,.3);
+}
+.avatar img { width: 72px; height: 72px; object-fit: cover; }
+.avatar-gender {
+  position: absolute; bottom: 0; right: calc(50% - 44px);
+  width: 22px; height: 22px; border-radius: 50%;
+  font-size: 12px; display: flex; align-items: center; justify-content: center;
+  border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,.15);
+}
+.gender-l { background: #dbeafe; }
+.gender-p { background: #fce7f3; }
+
+/* Card content */
+.card-nama {
+  font-size: 14px; font-weight: 800; color: #0f172a;
+  margin-bottom: 3px; line-height: 1.3;
+}
+.card-sub {
+  font-size: 11px; color: #94a3b8; font-weight: 600;
+  margin-bottom: 10px;
+}
+.card-tags {
+  display: flex; gap: 5px; justify-content: center;
+  flex-wrap: wrap; margin-bottom: 10px;
+}
+.tag {
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 10px; font-weight: 800; letter-spacing: .3px;
+}
+.tag-angkatan { background: #f0fdf4; color: #059669; border: 1px solid #a7f3d0; }
+.tag-program  { background: #fefce8; color: #854d0e; border: 1px solid #fde68a; }
+.tag-ikhwan   { background: #dbeafe; color: #1e40af; }
+.tag-akhwat   { background: #fce7f3; color: #9d174d; }
+
+.card-info {
+  width: 100%; font-size: 11px; color: #64748b;
+  display: flex; flex-direction: column; gap: 4px;
+  margin-top: 6px; padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+.card-info-row { display: flex; align-items: center; gap: 6px; }
+.card-info-row span:first-child { flex-shrink: 0; }
+
+/* Empty state */
+.empty {
+  text-align: center; padding: 80px 20px;
+  color: #94a3b8;
+}
+.empty .icon { font-size: 56px; margin-bottom: 16px; }
+.empty .msg { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.empty .sub { font-size: 13px; }
+
+/* Mobile */
+@media (max-width: 600px) {
+  .alumni-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .alumni-card { padding: 16px 12px 14px; }
+  .avatar { width: 58px; height: 58px; font-size: 22px; }
+  .avatar img { width: 58px; height: 58px; }
+  .avatar-gender { right: calc(50% - 38px); }
+  .card-nama { font-size: 13px; }
+  .stat-chip .num { font-size: 16px; }
+}
+@media (max-width: 400px) {
+  .alumni-grid { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Header banner -->
+<div style="background:linear-gradient(135deg,#064e3b,#059669);padding:28px 20px 48px;text-align:center;color:white;position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 80%22><circle cx=%2240%22 cy=%2240%22 r=%2238%22 fill=%22none%22 stroke=%22rgba(255,255,255,.06)%22 stroke-width=%221%22/></svg>') center/200px repeat;"></div>
+  <div style="position:relative;">
+    <div style="font-size:13px;font-weight:700;opacity:.75;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Pondok Pesantren Al-Inayah</div>
+    <div style="font-size:22px;font-weight:900;margin-bottom:4px;">🔍 Direktori Alumni</div>
+    <div style="font-size:13px;opacity:.8;">Temukan teman sepesantren dari seluruh Indonesia</div>
+  </div>
+</div>
+
+<div class="container" style="margin-top:-28px;padding-bottom:40px;position:relative;z-index:1;">
+
+  <!-- Stat chips -->
+  <div class="stat-chips">
+    <div class="stat-chip">
+      <span>🎓</span>
+      <div><div class="num">{{ total }}</div><div style="font-size:10px;color:#64748b;font-weight:700;">Alumni</div></div>
+    </div>
+    <div class="stat-chip">
+      <span>📅</span>
+      <div><div class="num">{{ angkatan_list|length }}</div><div style="font-size:10px;color:#64748b;font-weight:700;">Tahun Masuk</div></div>
+    </div>
+    <div class="stat-chip">
+      <span>🗺️</span>
+      <div><div class="num">{{ provinsi_count }}</div><div style="font-size:10px;color:#64748b;font-weight:700;">Provinsi</div></div>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="search-wrap">
+    <form method="get" id="filter-form">
+      <div class="search-row">
+        <input type="text" name="q" value="{{ q }}" placeholder="🔍  Cari nama, no induk, pekerjaan...">
+        <select name="angkatan">
+          <option value="">Semua Tahun Masuk</option>
+          {% for a in angkatan_list %}
+          <option value="{{ a }}" {% if angkatan == a|string %}selected{% endif %}>Tahun Masuk {{ a }}</option>
+          {% endfor %}
+        </select>
+        <select name="program">
+          <option value="">Semua Program</option>
+          <option value="SMP" {% if program=='SMP' %}selected{% endif %}>SMP</option>
+          <option value="MTS" {% if program=='MTS' %}selected{% endif %}>MTS</option>
+          <option value="SMK" {% if program=='SMK' %}selected{% endif %}>SMK</option>
+          <option value="Tahfidz" {% if program=='Tahfidz' %}selected{% endif %}>Tahfidz</option>
+          <option value="Kitab" {% if program=='Kitab' %}selected{% endif %}>Kitab</option>
+          <option value="Umum" {% if program=='Umum' %}selected{% endif %}>Umum</option>
+        </select>
+      </div>
+      <div class="search-row" style="margin-top:10px;">
+        <select name="provinsi" id="sel-provinsi" onchange="this.form.kota.value='';this.form.submit()">
+          <option value="">🗺️ Semua Provinsi</option>
+          {% for p in provinsi_list %}
+          <option value="{{ p }}" {% if provinsi == p %}selected{% endif %}>{{ p }}</option>
+          {% endfor %}
+        </select>
+        <select name="kota" id="sel-kota">
+          <option value="">🏙️ Semua Kota/Kab</option>
+          {% for k in kota_list %}
+          <option value="{{ k }}" {% if kota == k %}selected{% endif %}>{{ k }}</option>
+          {% endfor %}
+        </select>
+        <input type="text" name="kecamatan" value="{{ kecamatan }}" placeholder="Kecamatan..." style="min-width:130px;">
+        <input type="text" name="desa" value="{{ desa }}" placeholder="Desa/Kelurahan..." style="min-width:140px;">
+        <button type="submit" class="btn btn-primary" style="white-space:nowrap;">Cari</button>
+        {% if q or angkatan or program or provinsi or kota or kecamatan or desa %}
+        <a href="/direktori" class="btn" style="white-space:nowrap;background:#f1f5f9;color:#475569;font-weight:700;padding:10px 16px;border-radius:12px;text-decoration:none;">Reset</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Results label -->
+  {% if q or angkatan or program or provinsi or kota or kecamatan or desa %}
+  <div style="font-size:13px;color:#64748b;font-weight:600;margin-bottom:16px;">
+    Menampilkan <strong style="color:#059669;">{{ alumni_list|length }}</strong> hasil
+    {% if q %} · "<strong style="color:#0f172a;">{{ q }}</strong>"{% endif %}
+    {% if angkatan %} · Tahun Masuk <strong style="color:#0f172a;">{{ angkatan }}</strong>{% endif %}
+    {% if program %} · <strong style="color:#0f172a;">{{ program }}</strong>{% endif %}
+    {% if provinsi %} · <strong style="color:#0f172a;">{{ provinsi }}</strong>{% endif %}
+    {% if kota %} · <strong style="color:#0f172a;">{{ kota }}</strong>{% endif %}
+    {% if kecamatan %} · Kec. <strong style="color:#0f172a;">{{ kecamatan }}</strong>{% endif %}
+    {% if desa %} · Desa <strong style="color:#0f172a;">{{ desa }}</strong>{% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Grid -->
+  {% if not alumni_list %}
+  <div class="empty">
+    <div class="icon">👤</div>
+    <div class="msg">Tidak ada alumni ditemukan</div>
+    <div class="sub">Coba kata kunci yang berbeda</div>
+  </div>
+  {% else %}
+  <div class="alumni-grid">
+    {% for a in alumni_list %}
+    <a href="/alumni/{{ a.id }}" class="alumni-card">
+
+      <div class="avatar-wrap">
+        <div class="avatar">
+          {% if a.foto %}
+            <img src="/static/foto_alumni/{{ a.foto }}" alt="{{ a.nama_lengkap }}">
+          {% else %}
+            {{ a.nama_lengkap[0]|upper }}
+          {% endif %}
+        </div>
+        {% if a.jenis_kelamin == 'L' %}
+          <div class="avatar-gender gender-l">♂</div>
+        {% elif a.jenis_kelamin == 'P' %}
+          <div class="avatar-gender gender-p">♀</div>
+        {% endif %}
+      </div>
+
+      <div class="card-nama">{{ a.nama_lengkap }}</div>
+      {% if a.nama_panggilan %}
+        <div class="card-sub">{{ a.nama_panggilan }}</div>
+      {% else %}
+        <div class="card-sub" style="height:16px;"></div>
+      {% endif %}
+
+      <div class="card-tags">
+        {% if a.angkatan %}
+          <span class="tag tag-angkatan">Angk. {{ a.angkatan }}</span>
+        {% endif %}
+        {% if a.program %}
+          <span class="tag tag-program">{{ a.program }}</span>
+        {% endif %}
+      </div>
+
+      <div class="card-info">
+        {% if a.kota or a.provinsi %}
+        <div class="card-info-row">
+          <span>📍</span>
+          <span>{{ [a.kota, a.provinsi] | select | join(', ') or '—' }}</span>
+        </div>
+        {% endif %}
+        {% if a.pekerjaan %}
+        <div class="card-info-row">
+          <span>💼</span>
+          <span>{{ a.pekerjaan }}</span>
+        </div>
+        {% endif %}
+        {% if a.tahun_masuk or a.tahun_keluar %}
+        <div class="card-info-row">
+          <span>📅</span>
+          <span>{{ a.tahun_masuk or '?' }} – {{ a.tahun_keluar or 'skrg' }}</span>
+        </div>
+        {% endif %}
+      </div>
+
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
